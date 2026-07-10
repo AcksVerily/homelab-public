@@ -1,0 +1,92 @@
+services:
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    restart: unless-stopped
+    ports:
+      - 9090:9090
+    volumes:
+      - ./prometheus/config/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./prometheus/data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--storage.tsdb.retention.time=30d'
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    restart: unless-stopped
+    ports:
+      - 3000:3000
+    volumes:
+      - ./grafana/data:/var/lib/grafana
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=CHANGEME
+
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:latest
+    container_name: cadvisor
+    restart: unless-stopped
+    ports:
+      - 8081:8080
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+
+  node-exporter:
+    image: prom/node-exporter:latest
+    container_name: node-exporter
+    restart: unless-stopped
+    ports:
+      - 9100:9100
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.sysfs=/host/sys'
+      - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
+
+  adguard-exporter:
+    image: ebrianne/adguard-exporter:latest
+    container_name: adguard-exporter
+    restart: unless-stopped
+    ports:
+      - 9617:9617
+    environment:
+      - adguard_protocol=http
+      - adguard_hostname=YOUR_ADGUARD_IP
+      - adguard_port=80
+      - adguard_username=admin
+      - adguard_password=YOUR_ADGUARD_PASSWORD
+      - interval=30s
+      - log_limit=10000
+
+  pve-exporter:
+    image: prompve/prometheus-pve-exporter:latest
+    container_name: pve-exporter
+    restart: unless-stopped
+    ports:
+      - 9221:9221
+    environment:
+      - PVE_USER=pve_exporter@pve
+      - PVE_TOKEN_NAME=prometheus
+      - PVE_TOKEN_VALUE=YOUR_PVE_TOKEN
+      - PVE_VERIFY_SSL=false
+
+  graphite-exporter:
+    image: prom/graphite-exporter:latest
+    container_name: graphite-exporter
+    restart: unless-stopped
+    ports:
+      - 9109:9109
+      - 9108:9108
+      - 2003:9109
+    volumes:
+      - ./graphite/graphite_mapping.conf:/tmp/graphite_mapping.conf
+    command:
+      - '--graphite.mapping-config=/tmp/graphite_mapping.conf'
