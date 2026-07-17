@@ -1,0 +1,4 @@
+# Deploy to /etc/cron.d/pbs-azure-backup (root:root, 644)
+# Time this to run comfortably after both your GC schedule and your
+# backup-job schedule finish, so you're not syncing mid-prune or mid-backup.
+0 4 * * * root /usr/local/bin/pbs-azure-backup.sh

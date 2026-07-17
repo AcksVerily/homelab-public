@@ -15,6 +15,10 @@ A brief overview of how backups are structured across this homelab. Details are 
 - The sync credential used for the backup-server copy is deliberately scoped without delete permission, so a bug or compromise on the source side can add data but can't destroy what's already offsite.
 - Soft delete is enabled on the cloud storage account (30-day window) as a second, independent layer of protection against destructive syncs or accidental deletion.
 
+## Reference implementation
+
+`configs/scripts/pbs-azure-backup.sh` and `.cron` show the actual sync script used for the backup-server copy, sanitized. The no-delete SAS scoping described above is implemented right there in how the destination credential is generated, not in the script itself.
+
 ## Lessons learned
 
 - **A sync is not a backup** unless you've thought about what happens when the sync itself goes wrong. A live mirror that can delete or overwrite the remote copy defeats the purpose of having an offsite copy at all. Either restrict the sync credential's permissions, enable versioning/soft delete on the destination, or both.
