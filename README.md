@@ -29,3 +29,8 @@ All sensitive values (passwords, tokens, domains, IPs) have been replaced with p
 - Tailscale subnet router runs on the Docker host for remote LAN access
 - AdGuard Home runs as a Proxmox LXC with a secondary instance on Docker for redundancy
 - All external traffic routes through Cloudflare Tunnel to Nginx Proxy Manager
+
+## Documentation
+
+- [Backup Strategy](docs/backup-strategy.md) -- 3-2-1 approach and lessons learned
+- [Monitoring Stack](docs/monitoring.md) -- Prometheus/Grafana setup notes and gotchas
